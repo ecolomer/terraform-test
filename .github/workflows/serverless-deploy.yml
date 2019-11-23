@@ -35,13 +35,6 @@ jobs:
             aws s3 cp ${dir%%/*}.zip s3://ec-lambda-deploy/${dir%%/*}.zip
             # aws lambda update-function-code --function-name ${dir%%/*} --s3-bucket ec-lambda-deploy --s3-key ${dir%%/*}.zip
             popd
+            directories[dir]="done"
           fi
         done
-    #- name: Update lambda code
-    #  uses: actions/aws/cli@master
-    #  with:
-    #    args: lambda update-function-code --function-name BattleOfRuneterraDev --s3-bucket battle-of-runaterra-lambda-dev --s3-key gocode.zip
-    #  env:
-    #      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET }}
-    #      AWS_DEFAULT_REGION: us-east-1
