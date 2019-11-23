@@ -24,7 +24,7 @@ jobs:
         files=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep '/source/')
         declare -A directories
         python -m pip install --upgrade pip
-        pip install aws-cli
+        pip install awscli
 
         for f in $files; do
           dir=$(dirname $f)
