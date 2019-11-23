@@ -28,13 +28,13 @@ jobs:
 
         for f in $files; do
           dir=$(dirname $f)
-          if [ -z ${directories[dir]} ]; then
+          if [ -z ${directories[$dir]} ]; then
             pushd $dir
             pip install -r requirements.txt --target .
             zip -r ${dir%%/*}.zip *
             aws s3 cp ${dir%%/*}.zip s3://ec-lambda-deploy/${dir%%/*}.zip
             # aws lambda update-function-code --function-name ${dir%%/*} --s3-bucket ec-lambda-deploy --s3-key ${dir%%/*}.zip
             popd
-            directories[dir]="done"
+            directories[$dir]="done"
           fi
         done
