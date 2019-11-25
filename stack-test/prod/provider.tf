@@ -5,17 +5,17 @@ provider "aws" {
 
 variable "terraform_workspace_id" {
   type    = string
-  default = "terraform-test"
+  default = "rds-monitoring-prod"
   description = "TF Cloud workspace"
 }
 
 terraform {
   required_version = ">= 0.12"
-  backend "remote" {
-    organization = "escherlab"
-
-    workspaces {
-      name = var.terraform_workspace_id
-    }
-  }
+  #backend "remote" {
+  #  organization = "glovo"
+#
+  #  workspaces {
+  #    name = var.terraform_workspace_id
+  #  }
+  #}
 }
