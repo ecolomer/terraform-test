@@ -1,6 +1,6 @@
 locals {
   env = "prod"
-  vpc_id = "vpc-38ab525d"
+  vpc_id = "vpc-2800f04f"
   custom_tags = {
     env = local.env
   }
@@ -11,9 +11,9 @@ module "rds-monitor" {
   aws_managed_policies = [
     "AWSLambdaVPCAccessExecutionRole"
   ]
-  package_name = "stack-test"
+  s3_bucket = "ec-lambda-deploy"
   function_name = "rds-monitor-liveness"
-  function_source = "${path.cwd}/source"
+  function_source = "source/"
   function_runtime = "python3.7"
   handler_config = { module="main", function="lambda_handler"}
   custom_tags = merge(local.custom_tags, {project = "rds-monitor"})

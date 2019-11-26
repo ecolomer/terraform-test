@@ -4,20 +4,9 @@ variable "custom_tags" {
   default = {}
 }
 
-variable "package_name" {
-  description = "Name of the source code package"
-  type = string
-}
-
 variable "s3_bucket" {
   description = "S3 bucket storing deployment packages"
   type = string
-}
-
-variable "s3_key_prefix" {
-  description = "Object key prefix for deployment packages"
-  type = string
-  default = ""
 }
 
 variable "function_name" {
@@ -56,6 +45,12 @@ variable "vpc_config" {
   description = "Lambda function VPC configuration"
   type = object({ vpc_id=string, subnets=set(string) })
   default = { vpc_id=null, subnets=[] }
+}
+
+variable "env_vars" {
+  description = "Lambda function environment variables"
+  type = map(string)
+  default = {}
 }
 
 variable "custom_policies" {

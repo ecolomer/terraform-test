@@ -12,18 +12,13 @@ data "aws_region" "current" {}
 data "archive_file" "zip" {
   type        = "zip"
   source_dir  = var.function_source
-  output_path = "${var.package_name}.zip"
+  output_path = "${var.function_name}.zip"
 }
 
 resource "aws_s3_bucket_object" "package" {
   bucket = var.s3_bucket
-  key    = "${var.s3_key_prefix}${var.package_name}.zip"
+  key    = "${var.function_name}.zip"
   source = data.archive_file.zip.output_path
-
-  # The filemd5() function is available in Terraform 0.11.12 and later
-  # For Terraform 0.11.11 and earlier, use the md5() function and the file() function:
-  # etag = "${md5(file("path/to/file"))}"
-  etag = "${filemd5("path/to/file")}"
 }
 
 data "aws_iam_policy_document" "trust" {
@@ -96,7 +91,8 @@ resource "aws_security_group" "this" {
 }
 
 resource "aws_lambda_function" "this" {
-  filename         = data.archive_file.zip.output_path
+  s3_bucket        = var.s3_bucket
+  s3_key           = "${var.function_name}.zip"
   source_code_hash = data.archive_file.zip.output_base64sha256
 
   function_name    = var.function_name
@@ -105,6 +101,10 @@ resource "aws_lambda_function" "this" {
   runtime          = var.function_runtime
   memory_size      = var.function_memory
   timeout          = var.function_timeout
+
+  environment {
+    variables = var.env_vars
+  }
 
   vpc_config {
     security_group_ids = var.vpc_config.vpc_id != null ? [aws_security_group.this[0].id] : []
