@@ -45,7 +45,7 @@ logger.setLevel(logging.INFO)
 try:
     conn = pymysql.connect(creds['host'], user=creds['username'], passwd=creds['password'], db=creds['database'], connect_timeout=5)
 except pymysql.MySQLError as e:
-    logger.error("ERROR: Unexpected error: Could not connect to MySQL instance.")
+    logger.error("ERROR: Unexpected error: Could not connect to MySQL instance")
     logger.error(e)
     sys.exit()
 
