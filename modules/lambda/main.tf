@@ -3,6 +3,8 @@ locals {
     terraform = "true",
     terraform_module = "lambda"
   }
+
+  environment_map = var.env_vars == null ? [] : [var.env_vars]
 }
 
 data "aws_caller_identity" "current" {}
@@ -76,7 +78,7 @@ resource "aws_iam_role_policy_attachment" "managed" {
 
 resource "aws_security_group" "this" {
   count = var.vpc_config.vpc_id != null ? 1 : 0
-  description = "Lambda function '${var.function_name}'"
+  description = "Lambda - ${var.function_name}"
   vpc_id = var.vpc_config.vpc_id
 
   egress {
@@ -102,8 +104,12 @@ resource "aws_lambda_function" "this" {
   memory_size      = var.function_memory
   timeout          = var.function_timeout
 
-  environment {
-    variables = var.env_vars
+  dynamic "environment" {
+    for_each = local.environment_map
+
+    content {
+      variables = environment.value
+    }
   }
 
   vpc_config {

@@ -50,7 +50,7 @@ variable "vpc_config" {
 variable "env_vars" {
   description = "Lambda function environment variables"
   type = map(string)
-  default = {}
+  default = null
 }
 
 variable "custom_policies" {
