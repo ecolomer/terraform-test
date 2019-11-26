@@ -24,15 +24,15 @@ jobs:
       run: |
         files=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep '/source/')
         declare -A directories
-        python -m pip install --upgrade pip
-        pip install awscli
+        python3 -m pip install --upgrade pip
+        pip3 install awscli
 
         for f in $files; do
           dir=$(dirname $f)
 
           if [ -z ${directories[$dir]} ]; then
             pushd $dir
-            pip install -r requirements.txt --target .
+            pip3 install -r requirements.txt --target .
             zip -r ${dir%%/*}.zip *
             aws s3 cp ${dir%%/*}.zip s3://${AWS_BUCKET_NAME}/${dir%%/*}.zip
 
