@@ -36,7 +36,10 @@ jobs:
             zip -r ${dir%%/*}.zip *
             aws s3 cp ${dir%%/*}.zip s3://${AWS_BUCKET_NAME}/${dir%%/*}.zip
 
+            echo "Testing aws lambda get"
+            aws lambda get-function --function-name ${dir%%/*}
             if $(aws lambda get-function --function-name ${dir%%/*} 2> /dev/null); then
+              echo "Testing aws lambda update"
               aws lambda update-function-code --function-name ${dir%%/*} --s3-bucket ${AWS_BUCKET_NAME} --s3-key ${dir%%/*}.zip
             fi
 
