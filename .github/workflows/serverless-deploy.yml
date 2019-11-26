@@ -20,6 +20,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: eu-west-1
+        AWS_BUCKET_NAME: ec-lambda-deploy
       run: |
         files=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep '/source/')
         declare -A directories
@@ -28,13 +29,19 @@ jobs:
 
         for f in $files; do
           dir=$(dirname $f)
+
           if [ -z ${directories[$dir]} ]; then
             pushd $dir
             pip install -r requirements.txt --target .
             zip -r ${dir%%/*}.zip *
-            aws s3 cp ${dir%%/*}.zip s3://ec-lambda-deploy/${dir%%/*}.zip
-            # aws lambda update-function-code --function-name ${dir%%/*} --s3-bucket ec-lambda-deploy --s3-key ${dir%%/*}.zip
+            aws s3 cp ${dir%%/*}.zip s3://${AWS_BUCKET_NAME}/${dir%%/*}.zip
+
+            if $(aws lambda get-function --function-name ${dir%%/*} 2> /dev/null); then
+              aws lambda update-function-code --function-name ${dir%%/*} --s3-bucket ${AWS_BUCKET_NAME} --s3-key ${dir%%/*}.zip
+            fi
+
             popd
             directories[$dir]="done"
           fi
+
         done
