@@ -49,7 +49,7 @@ except pymysql.MySQLError as e:
     logger.error(e)
     sys.exit()
 
-logger.info("SUCCESS: Connection to RDS MySQL instance succeeded")
+logger.info("SUCCESS: Connection to RDS MySQL instance succeeded.")
 
 def handler(event, context):
 
