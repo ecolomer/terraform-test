@@ -1,4 +1,4 @@
-name: 'Lambda function packaging/deployment'
+name: 'Lambda function deployment'
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
     - '**/source/**'
 
 jobs:
-  package:
+  deploy-function:
     runs-on: ubuntu-latest
 
     steps:
