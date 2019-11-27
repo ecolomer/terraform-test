@@ -16,30 +16,37 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: '3.6'
-    - name: Upload packages
+    - name: Upload packages / Update function
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
-        files=$(git diff-tree --no-commit-id --name-only -r ${{ github.event.pull_request.head.sha }} | grep '/source/' || true )
+        # Get list of files changed in last commit stored inside a 'source' directory
+        files=$(git diff-tree --no-commit-id --name-only -r ${{ github.event.pull_request.head.sha }} | grep '/source/' || true)
 
-        declare -A directories
+        # Install AWS CLI
         python3 -m pip install --upgrade pip
         pip3 install awscli
+
+        # Use 'directories' associative array to track already visited directories
+        declare -A directories
 
         for f in $files; do
           dir=$(dirname $f)
 
+          # If directory not seen yet, build dependencies, upload code and update function
           if [ -z ${directories[$dir]} ]; then
             pushd $dir
             source github.vars && rm -f github.vars
 
+            # If pull request opened, build dependencies and upload code
             if [ "${{ github.event.action }}" = "opened" ]; then
               pip3 install -r requirements.txt --target .
               zip -r ${AWS_LAMBDA_FUNCTION}.zip *
               aws s3 cp ${AWS_LAMBDA_FUNCTION}.zip s3://${AWS_BUCKET_NAME}/${AWS_LAMBDA_FUNCTION}.zip
             fi
 
+            # If pull request closed, update function
             if [ "${{ github.event.action }}" = "closed" ]; then
               aws lambda get-function --function-name ${AWS_LAMBDA_FUNCTION} > /dev/null 2>&1
 
