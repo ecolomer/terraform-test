@@ -22,6 +22,8 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
         files=$(git diff-tree --no-commit-id --name-only -r ${{ github.event.pull_request.head.sha }} | grep '/source/')
+        echo "Files:"
+        echo "@@ $files @@"
 
         if [ -z "$files" ]; then
           exit 0
