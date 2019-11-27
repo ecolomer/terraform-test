@@ -21,10 +21,13 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
+        echo $(git diff-tree --no-commit-id --name-only -r ${{ github.event.pull_request.head.sha }})
         files=$(git diff-tree --no-commit-id --name-only -r ${{ github.event.pull_request.head.sha }} | grep '/source/')
         declare -A directories
         python3 -m pip install --upgrade pip
         pip3 install awscli
+
+        echo "aws cli installed"
 
         for f in $files; do
           dir=$(dirname $f)
