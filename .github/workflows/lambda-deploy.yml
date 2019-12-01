@@ -18,7 +18,8 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: '3.6'
-    - name: Upload packages / Update function
+    - name: Upload packages
+      if: github.event.action != 'closed'
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -41,20 +42,45 @@ jobs:
             pushd $dir
             source github.vars && rm -f github.vars
 
-            # If pull request opened, build dependencies and upload code
-            if [ "${{ github.event.action }}" = "opened" ]; then
-              pip3 install -r requirements.txt --target .
-              zip -r ${AWS_LAMBDA_FUNCTION}.zip *
-              aws s3 cp ${AWS_LAMBDA_FUNCTION}.zip s3://${AWS_BUCKET_NAME}/${AWS_LAMBDA_FUNCTION}.zip
-            fi
+            # Build dependencies and upload code
+            pip3 install -r requirements.txt --target .
+            zip -r ${AWS_LAMBDA_FUNCTION}.zip *
+            aws s3 cp ${AWS_LAMBDA_FUNCTION}.zip s3://${AWS_BUCKET_NAME}/${AWS_LAMBDA_FUNCTION}.zip
 
-            # If pull request closed, update function
-            if [ "${{ github.event.action }}" = "closed" ]; then
-              aws lambda get-function --function-name ${AWS_LAMBDA_FUNCTION} > /dev/null 2>&1
+            popd
+            directories[$dir]="done"
+          fi
 
-              if [ "$?" -eq 0 ]; then
-                aws lambda update-function-code --function-name ${AWS_LAMBDA_FUNCTION} --s3-bucket ${AWS_BUCKET_NAME} --s3-key ${AWS_LAMBDA_FUNCTION}.zip
-              fi
+        done
+    - name: Update function
+      if: github.event.action == 'closed'
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+        # Get list of files changed in last commit stored inside a 'source' directory
+        files=$(git diff-tree --no-commit-id --name-only -r ${{ github.event.pull_request.merge_commit_sha }} | grep '/source/' || true)
+
+        # Install AWS CLI
+        python3 -m pip install --upgrade pip
+        pip3 install awscli
+
+        # Use 'directories' associative array to track already visited directories
+        declare -A directories
+
+        for f in $files; do
+          dir=$(dirname $f)
+
+          # If directory not seen yet, build dependencies, upload code and update function
+          if [ -z ${directories[$dir]} ]; then
+            pushd $dir
+            source github.vars && rm -f github.vars
+
+            # Update function
+            aws lambda get-function --function-name ${AWS_LAMBDA_FUNCTION} > /dev/null 2>&1
+
+            if [ "$?" -eq 0 ]; then
+              aws lambda update-function-code --function-name ${AWS_LAMBDA_FUNCTION} --s3-bucket ${AWS_BUCKET_NAME} --s3-key ${AWS_LAMBDA_FUNCTION}.zip
             fi
 
             popd
@@ -63,7 +89,9 @@ jobs:
 
         done
 
-  success-job:
+  # Need to define this job to return a success value for the workflow if pull request
+  # is closed but not merged
+  close-without-merge:
     runs-on: ubuntu-latest
     if: github.event.action == 'closed' && github.event.pull_request.merged != true
 
