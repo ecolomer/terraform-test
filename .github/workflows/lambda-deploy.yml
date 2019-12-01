@@ -47,7 +47,7 @@ jobs:
             fi
 
             # If pull request closed, update function
-            if [ "${{ github.event.action }}" = "closed" ]; then
+            if [ "${{ github.event.action }}" = "closed" -a "${{ github.event.pull_request.merged }}" = "true" ]; then
               aws lambda get-function --function-name ${AWS_LAMBDA_FUNCTION} > /dev/null 2>&1
 
               if [ "$?" -eq 0 ]; then
