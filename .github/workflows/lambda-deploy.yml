@@ -62,3 +62,11 @@ jobs:
           fi
 
         done
+
+  success-job:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed' && github.event.pull_request.merged != true
+
+    steps:
+      - name: Return success
+        run: exit 0
