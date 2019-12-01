@@ -13,7 +13,7 @@ jobs:
     steps:
     - name: Checkout source
       uses: actions/checkout@v1
-      if: github.event.action != "closed" || (github.event.action == "closed" && github.event.pull_request.merged == "true")
+      if: github.event.action != 'closed' || (github.event.action == 'closed' && github.event.pull_request.merged == 'true')
     - name: Setup Python 3.x
       uses: actions/setup-python@v1
       with:
