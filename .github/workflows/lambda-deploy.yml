@@ -59,7 +59,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
         # Get list of files changed in last commit stored inside a 'source' directory
-        echo "${{ toJson(github.event) }}"
+        #echo "${{ toJson(github.event) }}"
         files=$(git diff-tree --no-commit-id --name-only -r ${{ github.event.pull_request.merge_commit_sha }} | grep '/source/' || true)
 
         # Install AWS CLI
