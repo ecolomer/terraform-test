@@ -18,6 +18,10 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: '3.6'
+    - name: Install AWS CLI
+      run: |
+        python3 -m pip install --upgrade pip
+        pip3 install awscli
     - name: Upload packages
       if: github.event.action != 'closed'
       env:
@@ -26,10 +30,6 @@ jobs:
       run: |
         # Get list of files changed in last commit stored inside a 'source' directory
         files=$(git diff-tree --no-commit-id --name-only -r ${{ github.event.pull_request.head.sha }} | grep '/source/' || true)
-
-        # Install AWS CLI
-        python3 -m pip install --upgrade pip
-        pip3 install awscli
 
         # Use 'directories' associative array to track already visited directories
         declare -A directories
@@ -61,10 +61,6 @@ jobs:
         # Get list of files changed in last commit stored inside a 'source' directory
         files=$(git diff-tree --no-commit-id --name-only -r ${{ github.event.pull_request.merge_commit_sha }} | grep '/source/' || true)
 
-        # Install AWS CLI
-        python3 -m pip install --upgrade pip
-        pip3 install awscli
-
         # Use 'directories' associative array to track already visited directories
         declare -A directories
 
@@ -89,7 +85,7 @@ jobs:
 
         done
 
-  # Need to define this job to return a success value for the workflow if pull request
+  # Need to define this job to return a success value for the whole workflow if pull request
   # is closed but not merged
   close-without-merge:
     runs-on: ubuntu-latest
