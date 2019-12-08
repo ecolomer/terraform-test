@@ -19,7 +19,7 @@ module "rds-monitor" {
   ]
   s3_bucket = "ec-lambda-deploy"
   function_name = "rds-monitor"
-  function_source = "source/"
+  function_source = "../source/"
   function_runtime = "python3.7"
   handler_config = { module="main", function="lambda_handler"}
   custom_tags = local.tags
