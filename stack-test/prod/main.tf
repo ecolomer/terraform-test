@@ -17,6 +17,9 @@ module "rds-monitor" {
   aws_managed_policies = [
     "AWSLambdaVPCAccessExecutionRole"
   ]
+  custom_policies = [
+    "policies/secrets.json"
+  ]
   s3_bucket = "ec-lambda-deploy"
   function_name = "rds-monitor"
   function_source = "source/"
