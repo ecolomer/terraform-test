@@ -37,7 +37,7 @@ def notify_slack(message):
             % (response.status_code, response.text)
         )
 
-creds = aws_get_secret('db-prod-aurora-cluster-monitor-creds')
+creds = aws_get_secret('db-creds')
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
