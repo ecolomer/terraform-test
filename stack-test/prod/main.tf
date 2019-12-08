@@ -12,14 +12,13 @@ locals {
 }
 
 module "rds-monitor" {
-  source                 = "app.terraform.io/glovo/lambda/aws"
-  version                = "0.0.9"
+  source                 = "../../modules/lambda"
   aws_managed_policies = [
     "AWSLambdaVPCAccessExecutionRole"
   ]
   s3_bucket = "ec-lambda-deploy"
   function_name = "rds-monitor"
-  function_source = "source/"
+  function_source = "../source/"
   function_runtime = "python3.7"
   handler_config = { module="main", function="lambda_handler"}
   custom_tags = local.tags
