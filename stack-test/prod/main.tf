@@ -21,6 +21,12 @@ resource "aws_sns_topic" "notify_slack" {
   tags = local.tags
 }
 
+resource "aws_sns_topic_subscription" "notify_slack" {
+  topic_arn = aws_sns_topic.notify_slack.arn
+  protocol  = "lambda"
+  endpoint  = module.notify_slack_lambda.function_arn
+}
+
 module "notify_slack_lambda" {
   source                 = "../../modules/lambda"
 
