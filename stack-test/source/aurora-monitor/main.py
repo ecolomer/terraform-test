@@ -41,7 +41,7 @@ def handler(event, context):
         rows = cur.execute("show full processlist")
 
     if rows > 0:
-        #response = sns.publish(TopicArn=sns_topic, Message='No process running')
+        response = sns.publish(TopicArn=sns_topic, Message='No process running')
         logger.info("No process running")
 
     return None
