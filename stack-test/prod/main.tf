@@ -47,3 +47,31 @@ resource "aws_lambda_permission" "allow_cloudwatch_events" {
   principal = "events.amazonaws.com"
   source_arn = aws_cloudwatch_event_rule.every_five_minutes.arn
 }
+
+resource "aws_sns_topic" "sns_notification" {
+  name = "sns-notification"
+}
+
+data "aws_secretsmanager_secret" "slack_url" {
+  name = "slack-url"
+}
+
+data "aws_secretsmanager_secret_version" "slack_url" {
+  secret_id = data.aws_secretsmanager_secret.slack_url.id
+}
+
+module "notify_slack" {
+  source = "terraform-aws-modules/notify-slack/aws"
+  version = "2.3.0"
+
+  sns_topic_name   = aws_sns_topic.sns_notification.name
+  create_sns_topic = false
+
+  slack_webhook_url = data.aws_secretsmanager_secret_version.slack_url.secret_string
+  slack_channel     = "@eleatzar.colomer"
+  slack_username    = "eleatzar.colomer"
+
+  tags = {
+    Name = "notify-slack-simple"
+  }
+}
