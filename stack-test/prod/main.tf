@@ -30,7 +30,6 @@ module "notify_slack_lambda" {
   function_runtime = "python3.7"
   handler_config = { module="main", function="handler"}
   custom_tags = local.tags
-  vpc_config = { vpc_id = local.vpc_id, subnets = local.subnets }
 
   aws_managed_policies = [
     "AWSLambdaBasicExecutionRole"
