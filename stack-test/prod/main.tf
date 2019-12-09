@@ -12,8 +12,7 @@ locals {
 }
 
 module "rds-monitor" {
-  source                 = "app.terraform.io/glovo/lambda/aws"
-  version                = "0.0.9"
+  source                 = "../../modules/lambda"
   aws_managed_policies = [
     "AWSLambdaVPCAccessExecutionRole"
   ]

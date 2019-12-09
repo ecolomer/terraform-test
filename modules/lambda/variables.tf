@@ -1,5 +1,16 @@
+variable "default_tags" {
+  description = "Default tags applied to module resources"
+  type        = map(string)
+  default     = {
+    "env" = "dev",
+    "project" = "common",
+    "built-using" = "terraform"
+    "terraform-module" = "lambda"
+  }
+}
+
 variable "custom_tags" {
-  description = "Custom tags for application"
+  description = "Custom tags applied to module resources"
   type = map(string)
   default = {}
 }
@@ -15,13 +26,15 @@ variable "function_name" {
 }
 
 variable "function_source" {
-  description = "Lambda function source directory"
+  description = "Lambda function local source directory"
   type = string
+  default = "source"
 }
 
 variable "function_runtime" {
   description = "Lambda function runtime"
   type = string
+  default = "python3.6"
 }
 
 variable "function_memory" {
@@ -54,13 +67,13 @@ variable "env_vars" {
 }
 
 variable "custom_policies" {
-  description = "Set of files with JSON policies"
+  description = "Set of files with JSON AWS policies"
   type = set(string)
   default = []
 }
 
 variable "aws_managed_policies" {
-  description = "ARNs of the Managed AWS policies"
+  description = "Name of AWS Managed policies"
   type = set(string)
   default = []
 }

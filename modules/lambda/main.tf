@@ -1,16 +1,20 @@
 locals {
-  module_tags = {
-    terraform = "true",
-    terraform_module = "lambda"
-  }
-
   environment_map = var.env_vars == null ? [] : [var.env_vars]
 }
 
+# Used to get the current AWS Account Id
 data "aws_caller_identity" "current" {}
 
+# Used to get the current AWS Region
 data "aws_region" "current" {}
 
+# Used to generate "unique" names
+resource "random_id" "id" {
+  byte_length = 8
+}
+
+# This deployment package is used to initialize the Lambda function
+# If dependencies in the code need to be packaged, use GitHub Actions
 data "archive_file" "zip" {
   type        = "zip"
   source_dir  = var.function_source
@@ -36,9 +40,9 @@ data "aws_iam_policy_document" "trust" {
 }
 
 resource "aws_iam_role" "function" {
-  name               = var.function_name
+  name               = "${var.function_name}-${random_id.id.hex}"
   assume_role_policy = data.aws_iam_policy_document.trust.json
-  tags = merge(var.custom_tags, { Name="lambda-execution-${var.function_name}" })
+  tags = merge(var.default_tags, var.custom_tags, { Name="lambda-execution-${var.function_name}" })
 }
 
 data "aws_iam_policy_document" "default" {
@@ -78,6 +82,7 @@ resource "aws_iam_role_policy_attachment" "managed" {
 
 resource "aws_security_group" "this" {
   count = var.vpc_config.vpc_id != null ? 1 : 0
+  name = "${var.function_name}-${random_id.id.hex}"
   description = "Lambda - ${var.function_name}"
   vpc_id = var.vpc_config.vpc_id
 
@@ -89,14 +94,13 @@ resource "aws_security_group" "this" {
     description = "Allow all egress traffic"
   }
 
-  tags = merge(var.custom_tags, { Name="lambda-${var.function_name}" })
+  tags = merge(var.default_tags, var.custom_tags, { Name="lambda-${var.function_name}" })
 }
 
 resource "aws_lambda_function" "this" {
   s3_bucket        = var.s3_bucket
   s3_key           = "${var.function_name}.zip"
   source_code_hash = data.archive_file.zip.output_base64sha256
-
   function_name    = var.function_name
   role             = aws_iam_role.function.arn
   handler          = "${var.handler_config.module}.${var.handler_config.function}"
@@ -116,4 +120,6 @@ resource "aws_lambda_function" "this" {
     security_group_ids = var.vpc_config.vpc_id != null ? [aws_security_group.this[0].id] : []
     subnet_ids = var.vpc_config.subnets
   }
+
+  tags = merge(var.default_tags, var.custom_tags)
 }
