@@ -18,29 +18,11 @@ def aws_get_secret(secret_name):
     except:
         return sm_secret
 
-def notify_slack(message):
-    slack_url = os.environ['SLACK_WEBHOOK_URL']
-    slack_data = { 'text': message }
-
-    try:
-        response = requests.post(
-            slack_url, data=json.dumps(slack_data),
-            headers={'Content-Type': 'application/json'},
-            Timeout=5
-        )
-    except:
-        raise Exception("ERROR: Could not connect to Slack webhook endpoint")
-
-    if response.status_code != 200:
-        raise ValueError(
-            'Request to slack returned an error %s, the response is:\n%s'
-            % (response.status_code, response.text)
-        )
-
-creds = aws_get_secret('db-creds')
-
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+sns_topic = os.environ['SNS_SLACK_TOPIC']
+creds = aws_get_secret('db-creds')
 
 try:
     conn = pymysql.connect(creds['host'], user=creds['username'], passwd=creds['password'], db=creds['database'], connect_timeout=5)
@@ -49,15 +31,17 @@ except pymysql.MySQLError as e:
     logger.error(e)
     sys.exit()
 
-logger.info("SUCCESS: Connection to RDS MySQL instance succeeded.")
+logger.info("SUCCESS: Connection to RDS MySQL instance succeeded")
 
 def handler(event, context):
+
+    sns = boto3.client('sns')
 
     with conn.cursor() as cur:
         rows = cur.execute("show full processlist")
 
     if rows > 0:
-        #notify_slack("No process running")
+        #response = sns.publish(TopicArn=sns_topic, Message='No process running')
         logger.info("No process running")
 
     return None
