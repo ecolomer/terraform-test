@@ -17,7 +17,7 @@ def notify_slack(message):
             Timeout=5
         )
     except:
-        raise Exception("ERROR: Could not connect to Slack webhook endpoint")
+        raise Exception("ERROR: Could not connect to Slack webhook endpoint.")
 
     if response.status_code != 200:
         raise ValueError(
