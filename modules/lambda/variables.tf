@@ -1,14 +1,3 @@
-variable "default_tags" {
-  description = "Default tags applied to module resources"
-  type        = map(string)
-  default     = {
-    "env" = "dev",
-    "project" = "common",
-    "built-using" = "terraform"
-    "terraform-module" = "lambda"
-  }
-}
-
 variable "custom_tags" {
   description = "Custom tags applied to module resources"
   type = map(string)
@@ -52,6 +41,7 @@ variable "function_timeout" {
 variable "handler_config" {
   description = "Lambda function handler configuration"
   type = object({ module=string, function=string })
+  default = { module="index", function="handler" }
 }
 
 variable "vpc_config" {

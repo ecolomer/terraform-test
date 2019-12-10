@@ -1,5 +1,12 @@
 locals {
   environment_map = var.env_vars == null ? [] : [var.env_vars]
+
+  tags = {
+    project = terraform.workspace
+    env = "dev"
+    owner = terraform.workspace
+    built-using = "terraform"
+  }
 }
 
 # Used to get the current AWS Account Id
@@ -10,7 +17,7 @@ data "aws_region" "current" {}
 
 # Used to generate "unique" names
 resource "random_id" "id" {
-  byte_length = 8
+  byte_length = 4
 }
 
 # This deployment package is used to initialize the Lambda function
@@ -42,7 +49,7 @@ data "aws_iam_policy_document" "trust" {
 resource "aws_iam_role" "function" {
   name               = "${var.function_name}-${random_id.id.hex}"
   assume_role_policy = data.aws_iam_policy_document.trust.json
-  tags = merge(var.default_tags, var.custom_tags, { Name="lambda-execution-${var.function_name}" })
+  tags = merge(local.tags, var.custom_tags, { Name="lambda-execution-${var.function_name}" })
 }
 
 data "aws_iam_policy_document" "default" {
@@ -94,7 +101,7 @@ resource "aws_security_group" "this" {
     description = "Allow all egress traffic"
   }
 
-  tags = merge(var.default_tags, var.custom_tags, { Name="lambda-${var.function_name}" })
+  tags = merge(local.tags, var.custom_tags, { Name="lambda-${var.function_name}" })
 }
 
 resource "aws_lambda_function" "this" {
@@ -121,5 +128,5 @@ resource "aws_lambda_function" "this" {
     subnet_ids = var.vpc_config.subnets
   }
 
-  tags = merge(var.default_tags, var.custom_tags)
+  tags = merge(local.tags, var.custom_tags)
 }
