@@ -2,9 +2,9 @@ locals {
   environment_map = var.env_vars == null ? [] : [var.env_vars]
 
   tags = {
-    project = terraform.workspace
+    project = var.function_name
     env = "dev"
-    owner = terraform.workspace
+    owner = var.function_name
     built-using = "terraform"
   }
 }

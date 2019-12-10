@@ -6,6 +6,7 @@ locals {
   tags = {
     project = "aurora-monitor"
     env = "prod"
+    owner = "infrastructure"
     built-using = "terraform"
   }
 }
