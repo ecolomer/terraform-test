@@ -65,10 +65,7 @@ module "aurora_monitor_lambda" {
     "AWSLambdaVPCAccessExecutionRole"
   ]
 
-  custom_policies = [
-    "policies/secrets.json"
-  ]
-
+  custom_policies = fileset(path.cwd, "policies/**")
   env_vars = { SNS_SLACK_TOPIC = aws_sns_topic.notify_slack.arn }
 }
 
