@@ -41,7 +41,7 @@ variable "function_timeout" {
 variable "handler_config" {
   description = "Lambda function handler configuration"
   type = object({ module=string, function=string })
-  default = object({ module="index", handler="handler"})
+  default = { module="index", function="handler" }
 }
 
 variable "vpc_config" {
