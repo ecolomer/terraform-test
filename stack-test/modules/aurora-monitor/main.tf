@@ -12,6 +12,19 @@ resource "random_id" "id" {
   byte_length = 4
 }
 
+data "aws_iam_policy_document" "allow_sns_publish" {
+  statement {
+    effect = "Allow"
+    actions = ["SNS:Publish"]
+    resources = [var.slack_sns_topic]
+  }
+}
+
+resource "local_file" "foo" {
+  content  = data.aws_iam_policy_document.allow_sns_publish.json
+  filename = "${path.cwd}/policies/sns.json"
+}
+
 module "aurora_monitor_lambda" {
   source = "../lambda"
 
