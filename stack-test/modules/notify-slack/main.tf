@@ -12,6 +12,20 @@ resource "random_id" "id" {
   byte_length = 4
 }
 
+data "aws_iam_policy_document" "allow_sns_publish" {
+  statement {
+    effect = "Allow"
+    actions = ["SNS:Publish"]
+    resources = [aws_sns_topic.this.arn]
+  }
+}
+
+resource "local_file" "sns_policy_file" {
+  content  = data.aws_iam_policy_document.allow_sns_publish.json
+  filename = "${path.cwd}/policies/sns.json"
+  file_permission = "0644"
+}
+
 resource "aws_sns_topic" "this" {
   name         = "slack-${random_id.id.hex}"
   display_name = "Slack notifications"
