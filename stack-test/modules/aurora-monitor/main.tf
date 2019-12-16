@@ -4,7 +4,7 @@ locals {
     project     = var.project_name
     env         = var.environment
     owner       = var.project_owner
-    built-using = "terraform"
+    built-using = "terraform1"
   }
 }
 
