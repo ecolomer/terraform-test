@@ -10,7 +10,7 @@ locals {
     project     = local.project_name
     env         = local.env
     owner       = local.project_owner
-    built-using = "terraform"
+    built-using = "terraform-test"
   }
 }
 
