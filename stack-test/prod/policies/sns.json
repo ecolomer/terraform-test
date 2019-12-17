@@ -1,0 +1,12 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "SNS:Publish"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:sns:eu-west-1:219160516627:slack-93faa50e"
+    }
+  ]
+}
