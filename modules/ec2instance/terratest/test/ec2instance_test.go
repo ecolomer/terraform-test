@@ -33,7 +33,7 @@ func TestTerraformAwsEc2Instance(t *testing.T) {
 
 	// Setup and Deploy. Define Terraform options to be used and deploy infrastructure
 	test_structure.RunTestStage(t, "setup", func() {
-		logger.Log(t, "################## Setting up TF Options ##################")
+		logger.Log(t, "################## Setting up TF Options ###################")
 		terraformVars := getTerraformVars(t)
 		terraformOptions := &terraform.Options{TerraformDir: workingDir, Vars: terraformVars}
 		test_structure.SaveTerraformOptions(t, workingDir, terraformOptions)
