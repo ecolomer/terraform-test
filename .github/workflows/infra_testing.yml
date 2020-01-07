@@ -18,13 +18,13 @@ jobs:
         bash <(curl -s https://raw.githubusercontent.com/wata727/tflint/master/install_linux.sh)
     - name: Lint module files
       run: |
-        tflint *.tf
+        tflint modules/ec2instance/*.tf
     - name: Lint test files
       run: |
-        tflint terratest/examples/*.tf
+        tflint modules/ec2instance/terratest/examples/*.tf
     - name: Run tests
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
-        cd terratest/test && go test -v ec2instance_test.go
+        cd modules/ec2instance/terratest/test && go test -v ec2instance_test.go
