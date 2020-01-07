@@ -18,6 +18,7 @@ jobs:
         bash <(curl -s https://raw.githubusercontent.com/wata727/tflint/master/install_linux.sh)
     - name: Lint module files
       run: |
+        cd modules/ec2instance
         tflint *.tf
     - name: Lint test files
       run: |
