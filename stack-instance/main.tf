@@ -7,7 +7,7 @@ locals {
 }
 
 module "instance" {
-  source                 = "../modules/ec2instance"
+  source                 = "github.com/ecolomer/terraform-test//modules/ec2instance?ref=ec2-instance"
 
   instance_name = "test-instance"
   instance_type = "t2.micro"
